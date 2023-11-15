@@ -1,0 +1,732 @@
+--------- config parameters ----------
+{
+    "checkpoint_params": {
+        "load_checkpoint": false,
+        "schema": null
+    },
+    "training_hyperparams": {
+        "lr_warmup_epochs": 3,
+        "lr_warmup_steps": 0,
+        "lr_cooldown_epochs": 0,
+        "warmup_initial_lr": 1e-06,
+        "cosine_final_lr_ratio": 0.1,
+        "optimizer": "Adam",
+        "optimizer_params": {
+            "weight_decay": 0.0001
+        },
+        "criterion_params": {},
+        "ema": true,
+        "batch_accumulate": 1,
+        "ema_params": {
+            "decay": 0.9,
+            "decay_type": "threshold"
+        },
+        "zero_weight_decay_on_bias_and_bn": true,
+        "load_opt_params": true,
+        "run_validation_freq": 1,
+        "run_test_freq": 1,
+        "save_model": true,
+        "metric_to_watch": "mAP@0.50",
+        "launch_tensorboard": false,
+        "tb_files_user_prompt": false,
+        "silent_mode": false,
+        "mixed_precision": true,
+        "tensorboard_port": null,
+        "save_ckpt_epoch_list": [],
+        "average_best_models": true,
+        "dataset_statistics": false,
+        "save_tensorboard_to_s3": false,
+        "lr_schedule_function": null,
+        "train_metrics_list": [],
+        "valid_metrics_list": [
+            "DetectionMetrics_050(\n  (post_prediction_callback): PPYoloEPostPredictionCallback()\n)"
+        ],
+        "greater_metric_to_watch_is_better": true,
+        "precise_bn": false,
+        "precise_bn_batch_size": null,
+        "seed": 42,
+        "lr_mode": "cosine",
+        "phase_callbacks": null,
+        "log_installed_packages": true,
+        "sg_logger": "base_sg_logger",
+        "sg_logger_params": {
+            "tb_files_user_prompt": false,
+            "project_name": "",
+            "launch_tensorboard": false,
+            "tensorboard_port": null,
+            "save_checkpoints_remote": false,
+            "save_tensorboard_remote": false,
+            "save_logs_remote": false
+        },
+        "warmup_mode": "linear_epoch_step",
+        "step_lr_update_freq": null,
+        "lr_updates": [],
+        "clip_grad_norm": null,
+        "pre_prediction_callback": null,
+        "ckpt_best_name": "ckpt_best.pth",
+        "enable_qat": false,
+        "resume": false,
+        "resume_path": null,
+        "ckpt_name": "ckpt_latest.pth",
+        "resume_strict_load": false,
+        "sync_bn": false,
+        "kill_ddp_pgroup_on_end": true,
+        "max_train_batches": null,
+        "max_valid_batches": null,
+        "resume_from_remote_sg_logger": false,
+        "torch_compile": false,
+        "torch_compile_loss": false,
+        "torch_compile_options": {
+            "mode": "reduce-overhead",
+            "fullgraph": false,
+            "dynamic": false,
+            "backend": "inductor",
+            "options": null,
+            "disable": false
+        },
+        "schema": {
+            "type": "object",
+            "properties": {
+                "max_epochs": {
+                    "type": "number",
+                    "minimum": 1
+                },
+                "lr_decay_factor": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "lr_warmup_epochs": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                },
+                "initial_lr": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 10
+                }
+            },
+            "if": {
+                "properties": {
+                    "lr_mode": {
+                        "const": "StepLRScheduler"
+                    }
+                }
+            },
+            "then": {
+                "required": [
+                    "lr_updates",
+                    "lr_decay_factor"
+                ]
+            },
+            "required": [
+                "max_epochs",
+                "lr_mode",
+                "initial_lr",
+                "loss"
+            ]
+        },
+        "initial_lr": 0.0005,
+        "max_epochs": 25,
+        "loss": "PPYoloELoss(\n  (static_assigner): ATSSAssigner()\n  (assigner): TaskAlignedAssigner()\n)"
+    },
+    "dataset_params": {
+        "train_dataset_params": "{'data_dir': '/content/vehicle-detect-from-video-6', 'images_dir': 'train/images', 'labels_dir': 'train/labels', 'classes': ['1', '2', '3', '5', '7'], 'input_dim': [640, 640], 'cache_dir': None, 'cache': False, 'cache_annotations': True, 'ignore_empty_annotations': True, 'transforms': [{'DetectionMosaic': {'input_dim': [640, 640], 'prob': 1.0}}, {'DetectionRandomAffine': {'degrees': 10.0, 'translate': 0.1, 'scales': [0.1, 2], 'shear': 2.0, 'target_size': [640, 640], 'filter_box_candidates': True, 'wh_thr': 2, 'area_thr': 0.1, 'ar_thr': 20}}, {'DetectionMixup': {'input_dim': [640, 640], 'mixup_scale': [0.5, 1.5], 'prob': 1.0, 'flip_prob': 0.5}}, {'DetectionHSV': {'prob': 1.0, 'hgain': 5, 'sgain': 30, 'vgain': 30}}, {'DetectionHorizontalFlip': {'prob': 0.5}}, {'DetectionPaddedRescale': {'input_dim': [640, 640]}}, {'DetectionTargetsFormatTransform': {'input_dim': [640, 640], 'output_format': 'LABEL_CXCYWH'}}], 'class_inclusion_list': None, 'max_num_samples': None}",
+        "train_dataloader_params": {
+            "batch_size": 8,
+            "num_workers": 2,
+            "shuffle": true,
+            "drop_last": true,
+            "pin_memory": true,
+            "collate_fn": "<super_gradients.training.utils.collate_fn.detection_collate_fn.DetectionCollateFN object at 0x7de1b6a3a860>"
+        },
+        "valid_dataset_params": "{'data_dir': '/content/vehicle-detect-from-video-6', 'images_dir': 'valid/images', 'labels_dir': 'valid/labels', 'classes': ['1', '2', '3', '5', '7'], 'input_dim': [640, 640], 'cache_dir': None, 'cache': False, 'cache_annotations': True, 'ignore_empty_annotations': True, 'transforms': [{'DetectionPaddedRescale': {'input_dim': [640, 640]}}, {'DetectionTargetsFormatTransform': {'input_dim': [640, 640], 'output_format': 'LABEL_CXCYWH'}}], 'class_inclusion_list': None, 'max_num_samples': None}",
+        "valid_dataloader_params": {
+            "batch_size": 8,
+            "num_workers": 2,
+            "drop_last": false,
+            "pin_memory": true,
+            "collate_fn": "<super_gradients.training.utils.collate_fn.detection_collate_fn.DetectionCollateFN object at 0x7de1b42f06a0>"
+        }
+    },
+    "additional_log_items": {
+        "initial_LR": 0.0005,
+        "num_devices": 1,
+        "multi_gpu": "None",
+        "device_type": "Tesla T4",
+        "installed_packages": {
+            "babel": "2.13.1",
+            "cython": "3.0.4",
+            "flask": "2.2.5",
+            "gdal": "3.4.3",
+            "jinja2": "3.1.2",
+            "markdown": "3.5",
+            "markupsafe": "2.1.3",
+            "pillow": "9.4.0",
+            "pydrive": "1.3.1",
+            "pydrive2": "1.6.3",
+            "pyopengl": "3.1.7",
+            "pysocks": "1.7.1",
+            "pywavelets": "1.4.1",
+            "pyyaml": "6.0.1",
+            "pygments": "2.16.1",
+            "sqlalchemy": "2.0.22",
+            "send2trash": "1.8.2",
+            "sphinx": "5.0.2",
+            "absl-py": "1.4.0",
+            "aiohttp": "3.8.6",
+            "aiosignal": "1.3.1",
+            "alabaster": "0.7.13",
+            "albumentations": "1.3.1",
+            "altair": "4.2.2",
+            "anyio": "3.7.1",
+            "appdirs": "1.4.4",
+            "argon2-cffi": "23.1.0",
+            "argon2-cffi-bindings": "21.2.0",
+            "array-record": "0.5.0",
+            "arviz": "0.15.1",
+            "astropy": "5.3.4",
+            "astunparse": "1.6.3",
+            "async-timeout": "4.0.3",
+            "atpublic": "4.0",
+            "attrs": "23.1.0",
+            "audioread": "3.0.1",
+            "autograd": "1.6.2",
+            "backcall": "0.2.0",
+            "beautifulsoup4": "4.11.2",
+            "bidict": "0.22.1",
+            "bigframes": "0.10.0",
+            "bleach": "6.1.0",
+            "blis": "0.7.11",
+            "blosc2": "2.0.0",
+            "bokeh": "3.2.2",
+            "bqplot": "0.12.42",
+            "branca": "0.6.0",
+            "build": "1.0.3",
+            "cachecontrol": "0.13.1",
+            "cachetools": "5.3.2",
+            "catalogue": "2.0.10",
+            "certifi": "2023.7.22",
+            "cffi": "1.16.0",
+            "chardet": "5.2.0",
+            "charset-normalizer": "3.3.1",
+            "chex": "0.1.7",
+            "click": "8.1.7",
+            "click-plugins": "1.1.1",
+            "cligj": "0.7.2",
+            "cloudpickle": "2.2.1",
+            "cmake": "3.27.7",
+            "cmdstanpy": "1.2.0",
+            "colorcet": "3.0.1",
+            "colorlover": "0.3.0",
+            "colour": "0.1.5",
+            "community": "1.0.0b1",
+            "confection": "0.1.3",
+            "cons": "0.4.6",
+            "contextlib2": "21.6.0",
+            "contourpy": "1.1.1",
+            "cryptography": "41.0.5",
+            "cufflinks": "0.17.3",
+            "cupy-cuda11x": "11.0.0",
+            "cvxopt": "1.3.2",
+            "cvxpy": "1.3.2",
+            "cycler": "0.12.1",
+            "cymem": "2.0.8",
+            "dask": "2023.8.1",
+            "datascience": "0.17.6",
+            "db-dtypes": "1.1.1",
+            "debugpy": "1.6.6",
+            "decorator": "4.4.2",
+            "defusedxml": "0.7.1",
+            "diskcache": "5.6.3",
+            "distributed": "2023.8.1",
+            "dlib": "19.24.2",
+            "dm-tree": "0.1.8",
+            "docutils": "0.18.1",
+            "dopamine-rl": "4.0.6",
+            "duckdb": "0.8.1",
+            "earthengine-api": "0.1.375",
+            "easydict": "1.11",
+            "ecos": "2.0.12",
+            "editdistance": "0.6.2",
+            "eerepr": "0.0.4",
+            "en-core-web-sm": "3.6.0",
+            "entrypoints": "0.4",
+            "et-xmlfile": "1.1.0",
+            "etils": "1.5.2",
+            "etuples": "0.3.9",
+            "exceptiongroup": "1.1.3",
+            "fastai": "2.7.13",
+            "fastcore": "1.5.29",
+            "fastdownload": "0.0.7",
+            "fastjsonschema": "2.18.1",
+            "fastprogress": "1.0.3",
+            "fastrlock": "0.8.2",
+            "filelock": "3.12.4",
+            "fiona": "1.9.5",
+            "firebase-admin": "5.3.0",
+            "flatbuffers": "23.5.26",
+            "flax": "0.7.4",
+            "folium": "0.14.0",
+            "fonttools": "4.43.1",
+            "frozendict": "2.3.8",
+            "frozenlist": "1.4.0",
+            "fsspec": "2023.6.0",
+            "future": "0.18.3",
+            "gast": "0.5.4",
+            "gcsfs": "2023.6.0",
+            "gdown": "4.6.6",
+            "geemap": "0.28.2",
+            "gensim": "4.3.2",
+            "geocoder": "1.38.1",
+            "geographiclib": "2.0",
+            "geopandas": "0.13.2",
+            "geopy": "2.3.0",
+            "gin-config": "0.5.0",
+            "glob2": "0.7",
+            "google": "2.0.3",
+            "google-api-core": "2.11.1",
+            "google-api-python-client": "2.84.0",
+            "google-auth": "2.17.3",
+            "google-auth-httplib2": "0.1.1",
+            "google-auth-oauthlib": "1.0.0",
+            "google-cloud-bigquery": "3.12.0",
+            "google-cloud-bigquery-connection": "1.12.1",
+            "google-cloud-bigquery-storage": "2.22.0",
+            "google-cloud-core": "2.3.3",
+            "google-cloud-datastore": "2.15.2",
+            "google-cloud-firestore": "2.11.1",
+            "google-cloud-functions": "1.13.3",
+            "google-cloud-iam": "2.12.2",
+            "google-cloud-language": "2.9.1",
+            "google-cloud-resource-manager": "1.10.4",
+            "google-cloud-storage": "2.8.0",
+            "google-cloud-translate": "3.11.3",
+            "google-colab": "1.0.0",
+            "google-crc32c": "1.5.0",
+            "google-pasta": "0.2.0",
+            "google-resumable-media": "2.6.0",
+            "googleapis-common-protos": "1.61.0",
+            "googledrivedownloader": "0.4",
+            "graphviz": "0.20.1",
+            "greenlet": "3.0.0",
+            "grpc-google-iam-v1": "0.12.6",
+            "grpcio": "1.59.0",
+            "grpcio-status": "1.48.2",
+            "gspread": "3.4.2",
+            "gspread-dataframe": "3.3.1",
+            "gym": "0.25.2",
+            "gym-notices": "0.0.8",
+            "h5netcdf": "1.2.0",
+            "h5py": "3.9.0",
+            "holidays": "0.35",
+            "holoviews": "1.17.1",
+            "html5lib": "1.1",
+            "httpimport": "1.3.1",
+            "httplib2": "0.22.0",
+            "humanize": "4.7.0",
+            "hyperopt": "0.2.7",
+            "ibis-framework": "6.2.0",
+            "idna": "3.4",
+            "imageio": "2.31.6",
+            "imageio-ffmpeg": "0.4.9",
+            "imagesize": "1.4.1",
+            "imbalanced-learn": "0.10.1",
+            "imgaug": "0.4.0",
+            "importlib-metadata": "6.8.0",
+            "importlib-resources": "6.1.0",
+            "imutils": "0.5.4",
+            "inflect": "7.0.0",
+            "iniconfig": "2.0.0",
+            "install": "1.3.5",
+            "intel-openmp": "2023.2.0",
+            "ipyevents": "2.0.2",
+            "ipyfilechooser": "0.6.0",
+            "ipykernel": "5.5.6",
+            "ipyleaflet": "0.17.4",
+            "ipython": "7.34.0",
+            "ipython-genutils": "0.2.0",
+            "ipython-sql": "0.5.0",
+            "ipytree": "0.2.2",
+            "ipywidgets": "7.7.1",
+            "itsdangerous": "2.1.2",
+            "jax": "0.4.16",
+            "jaxlib": "0.4.16+cuda11.cudnn86",
+            "jieba": "0.42.1",
+            "joblib": "1.3.2",
+            "jsonpickle": "3.0.2",
+            "jsonschema": "4.19.1",
+            "jsonschema-specifications": "2023.7.1",
+            "jupyter-client": "6.1.12",
+            "jupyter-console": "6.1.0",
+            "jupyter-core": "5.4.0",
+            "jupyter-server": "1.24.0",
+            "jupyterlab-pygments": "0.2.2",
+            "jupyterlab-widgets": "3.0.9",
+            "kaggle": "1.5.16",
+            "keras": "2.14.0",
+            "kiwisolver": "1.4.5",
+            "langcodes": "3.3.0",
+            "lazy-loader": "0.3",
+            "libclang": "16.0.6",
+            "librosa": "0.10.1",
+            "lida": "0.0.10",
+            "lightgbm": "4.1.0",
+            "linkify-it-py": "2.0.2",
+            "llmx": "0.0.15a0",
+            "llvmlite": "0.39.1",
+            "locket": "1.0.0",
+            "logical-unification": "0.4.6",
+            "lxml": "4.9.3",
+            "malloy": "2023.1058",
+            "markdown-it-py": "3.0.0",
+            "matplotlib": "3.7.1",
+            "matplotlib-inline": "0.1.6",
+            "matplotlib-venn": "0.11.9",
+            "mdit-py-plugins": "0.4.0",
+            "mdurl": "0.1.2",
+            "minikanren": "1.0.3",
+            "missingno": "0.5.2",
+            "mistune": "0.8.4",
+            "mizani": "0.9.3",
+            "mkl": "2023.2.0",
+            "ml-dtypes": "0.2.0",
+            "mlxtend": "0.22.0",
+            "more-itertools": "10.1.0",
+            "moviepy": "1.0.3",
+            "mpmath": "1.3.0",
+            "msgpack": "1.0.7",
+            "multidict": "6.0.4",
+            "multipledispatch": "1.0.0",
+            "multitasking": "0.0.11",
+            "murmurhash": "1.0.10",
+            "music21": "9.1.0",
+            "natsort": "8.4.0",
+            "nbclassic": "1.0.0",
+            "nbclient": "0.8.0",
+            "nbconvert": "6.5.4",
+            "nbformat": "5.9.2",
+            "nest-asyncio": "1.5.8",
+            "networkx": "3.2",
+            "nibabel": "4.0.2",
+            "nltk": "3.8.1",
+            "notebook": "6.5.5",
+            "notebook-shim": "0.2.3",
+            "numba": "0.56.4",
+            "numexpr": "2.8.7",
+            "numpy": "1.23.5",
+            "oauth2client": "4.1.3",
+            "oauthlib": "3.2.2",
+            "opencv-contrib-python": "4.8.0.76",
+            "opencv-python": "4.8.0.76",
+            "opencv-python-headless": "4.8.1.78",
+            "openpyxl": "3.1.2",
+            "opt-einsum": "3.3.0",
+            "optax": "0.1.7",
+            "orbax-checkpoint": "0.4.1",
+            "osqp": "0.6.2.post8",
+            "packaging": "23.2",
+            "pandas": "1.5.3",
+            "pandas-datareader": "0.10.0",
+            "pandas-gbq": "0.17.9",
+            "pandas-stubs": "1.5.3.230304",
+            "pandocfilters": "1.5.0",
+            "panel": "1.3.0",
+            "param": "2.0.0",
+            "parso": "0.8.3",
+            "parsy": "2.1",
+            "partd": "1.4.1",
+            "pathlib": "1.0.1",
+            "pathy": "0.10.3",
+            "patsy": "0.5.3",
+            "peewee": "3.17.0",
+            "pexpect": "4.8.0",
+            "pickleshare": "0.7.5",
+            "pip": "23.1.2",
+            "pip-tools": "6.13.0",
+            "platformdirs": "3.11.0",
+            "plotly": "5.15.0",
+            "plotnine": "0.12.3",
+            "pluggy": "1.3.0",
+            "polars": "0.17.3",
+            "pooch": "1.8.0",
+            "portpicker": "1.5.2",
+            "prefetch-generator": "1.0.3",
+            "preshed": "3.0.9",
+            "prettytable": "3.9.0",
+            "proglog": "0.1.10",
+            "progressbar2": "4.2.0",
+            "prometheus-client": "0.17.1",
+            "promise": "2.3",
+            "prompt-toolkit": "3.0.39",
+            "prophet": "1.1.5",
+            "proto-plus": "1.22.3",
+            "protobuf": "3.20.3",
+            "psutil": "5.9.5",
+            "psycopg2": "2.9.9",
+            "ptyprocess": "0.7.0",
+            "py4j": "0.10.9.7",
+            "pyopenssl": "23.2.0",
+            "py-cpuinfo": "9.0.0",
+            "pyarrow": "9.0.0",
+            "pyasn1": "0.5.0",
+            "pyasn1-modules": "0.3.0",
+            "pycocotools": "2.0.7",
+            "pycparser": "2.21",
+            "pyct": "0.5.0",
+            "pydantic": "1.10.13",
+            "pydata-google-auth": "1.8.2",
+            "pydot": "1.4.2",
+            "pydot-ng": "2.0.0",
+            "pydotplus": "2.0.2",
+            "pyerfa": "2.0.1.1",
+            "pygame": "2.5.2",
+            "pymc": "5.7.2",
+            "pymystem3": "0.2.0",
+            "pyparsing": "3.1.1",
+            "pyperclip": "1.8.2",
+            "pyproj": "3.6.1",
+            "pyproject-hooks": "1.0.0",
+            "pyshp": "2.3.1",
+            "pytensor": "2.14.2",
+            "pytest": "7.4.3",
+            "python-apt": "0.0.0",
+            "python-box": "7.1.1",
+            "python-dateutil": "2.8.2",
+            "python-louvain": "0.16",
+            "python-slugify": "8.0.1",
+            "python-utils": "3.8.1",
+            "pytz": "2023.3.post1",
+            "pyviz-comms": "3.0.0",
+            "pyzmq": "23.2.1",
+            "qdldl": "0.1.7.post0",
+            "qudida": "0.0.4",
+            "ratelim": "0.1.6",
+            "referencing": "0.30.2",
+            "regex": "2023.6.3",
+            "requests": "2.31.0",
+            "requests-oauthlib": "1.3.1",
+            "requirements-parser": "0.5.0",
+            "rich": "13.6.0",
+            "rpds-py": "0.10.6",
+            "rpy2": "3.4.2",
+            "rsa": "4.9",
+            "scikit-image": "0.19.3",
+            "scikit-learn": "1.2.2",
+            "scipy": "1.11.3",
+            "scooby": "0.9.2",
+            "scs": "3.2.3",
+            "seaborn": "0.12.2",
+            "setuptools": "67.7.2",
+            "shapely": "2.0.2",
+            "six": "1.16.0",
+            "sklearn-pandas": "2.2.0",
+            "smart-open": "6.4.0",
+            "sniffio": "1.3.0",
+            "snowballstemmer": "2.2.0",
+            "sortedcontainers": "2.4.0",
+            "soundfile": "0.12.1",
+            "soupsieve": "2.5",
+            "soxr": "0.3.7",
+            "spacy": "3.6.1",
+            "spacy-legacy": "3.0.12",
+            "spacy-loggers": "1.0.5",
+            "sphinxcontrib-applehelp": "1.0.7",
+            "sphinxcontrib-devhelp": "1.0.5",
+            "sphinxcontrib-htmlhelp": "2.0.4",
+            "sphinxcontrib-jsmath": "1.0.1",
+            "sphinxcontrib-qthelp": "1.0.6",
+            "sphinxcontrib-serializinghtml": "1.1.9",
+            "sqlglot": "17.16.2",
+            "sqlparse": "0.4.4",
+            "srsly": "2.4.8",
+            "stanio": "0.3.0",
+            "statsmodels": "0.14.0",
+            "sympy": "1.12",
+            "tables": "3.8.0",
+            "tabulate": "0.9.0",
+            "tbb": "2021.10.0",
+            "tblib": "3.0.0",
+            "tenacity": "8.2.3",
+            "tensorboard": "2.14.1",
+            "tensorboard-data-server": "0.7.2",
+            "tensorflow": "2.14.0",
+            "tensorflow-datasets": "4.9.3",
+            "tensorflow-estimator": "2.14.0",
+            "tensorflow-gcs-config": "2.14.0",
+            "tensorflow-hub": "0.15.0",
+            "tensorflow-io-gcs-filesystem": "0.34.0",
+            "tensorflow-metadata": "1.14.0",
+            "tensorflow-probability": "0.22.0",
+            "tensorstore": "0.1.45",
+            "termcolor": "2.3.0",
+            "terminado": "0.17.1",
+            "text-unidecode": "1.3",
+            "textblob": "0.17.1",
+            "tf-slim": "1.1.0",
+            "thinc": "8.1.12",
+            "threadpoolctl": "3.2.0",
+            "tifffile": "2023.9.26",
+            "tinycss2": "1.2.1",
+            "toml": "0.10.2",
+            "tomli": "2.0.1",
+            "toolz": "0.12.0",
+            "torch": "2.1.0+cu118",
+            "torchaudio": "2.1.0+cu118",
+            "torchdata": "0.7.0",
+            "torchsummary": "1.5.1",
+            "torchtext": "0.16.0",
+            "torchvision": "0.16.0+cu118",
+            "tornado": "6.3.2",
+            "tqdm": "4.66.1",
+            "traitlets": "5.7.1",
+            "traittypes": "0.2.1",
+            "triton": "2.1.0",
+            "tweepy": "4.13.0",
+            "typer": "0.9.0",
+            "types-pytz": "2023.3.1.1",
+            "types-setuptools": "68.2.0.0",
+            "typing-extensions": "4.5.0",
+            "tzlocal": "5.2",
+            "uc-micro-py": "1.0.2",
+            "uritemplate": "4.1.1",
+            "urllib3": "2.0.7",
+            "vega-datasets": "0.9.0",
+            "wasabi": "1.1.2",
+            "wcwidth": "0.2.8",
+            "webcolors": "1.13",
+            "webencodings": "0.5.1",
+            "websocket-client": "1.6.4",
+            "werkzeug": "3.0.1",
+            "wheel": "0.41.2",
+            "widgetsnbextension": "3.6.6",
+            "wordcloud": "1.9.2",
+            "wrapt": "1.14.1",
+            "xarray": "2023.7.0",
+            "xarray-einstats": "0.6.0",
+            "xgboost": "2.0.1",
+            "xlrd": "2.0.1",
+            "xxhash": "3.4.1",
+            "xyzservices": "2023.10.0",
+            "yarl": "1.9.2",
+            "yellowbrick": "1.5",
+            "yfinance": "0.2.31",
+            "zict": "3.0.0",
+            "zipp": "3.17.0",
+            "pygobject": "3.42.1",
+            "pyjwt": "2.3.0",
+            "secretstorage": "3.3.1",
+            "blinker": "1.4",
+            "dbus-python": "1.2.18",
+            "distro": "1.7.0",
+            "jeepney": "0.7.1",
+            "keyring": "23.5.0",
+            "launchpadlib": "1.10.16",
+            "lazr.restfulclient": "0.14.4",
+            "lazr.uri": "1.0.6",
+            "wadllib": "1.3.6"
+        }
+    }
+}
+------- config parameters end --------
+
+Epoch 0 (1/25)  - Inference_Time: 966.7240600585938	Train_PPYoloELoss/loss_cls: 2.15944504737854	Train_PPYoloELoss/loss_iou: 0.98736971616745	Train_PPYoloELoss/loss_dfl: 0.7826963663101196	Train_PPYoloELoss/loss: 3.929511547088623	Valid_PPYoloELoss/loss_cls: 2.3624041080474854	Valid_PPYoloELoss/loss_iou: 0.6632339358329773	Valid_PPYoloELoss/loss_dfl: 0.4383220076560974	Valid_PPYoloELoss/loss: 3.4639601707458496	Valid_Precision@0.50: 0.0	Valid_Recall@0.50: 0.0	Valid_mAP@0.50: 0.01690388098359108	Valid_F1@0.50: 0.0	
+
+Epoch 0 (1/25)  - LR/Param_group_0: 1e-06	LR/Param_group_1: 1e-06	
+
+Epoch 1 (2/25)  - Inference_Time: 1475.7813720703125	Train_PPYoloELoss/loss_cls: 1.4175021648406982	Train_PPYoloELoss/loss_iou: 0.7225116491317749	Train_PPYoloELoss/loss_dfl: 0.5576211810112	Train_PPYoloELoss/loss: 2.6976351737976074	Valid_PPYoloELoss/loss_cls: 1.8465254306793213	Valid_PPYoloELoss/loss_iou: 0.5163488984107971	Valid_PPYoloELoss/loss_dfl: 0.34567126631736755	Valid_PPYoloELoss/loss: 2.708545446395874	Valid_Precision@0.50: 0.01788211241364479	Valid_Recall@0.50: 0.6811081767082214	Valid_mAP@0.50: 0.28213825821876526	Valid_F1@0.50: 0.03466083109378815	
+
+Epoch 1 (2/25)  - LR/Param_group_0: 0.00016733333333333333	LR/Param_group_1: 0.00016733333333333333	
+
+Epoch 2 (3/25)  - Inference_Time: 1204.3328857421875	Train_PPYoloELoss/loss_cls: 1.1171934604644775	Train_PPYoloELoss/loss_iou: 0.6258052587509155	Train_PPYoloELoss/loss_dfl: 0.4935521185398102	Train_PPYoloELoss/loss: 2.2365505695343018	Valid_PPYoloELoss/loss_cls: 1.082068681716919	Valid_PPYoloELoss/loss_iou: 0.5179917216300964	Valid_PPYoloELoss/loss_dfl: 0.3547331690788269	Valid_PPYoloELoss/loss: 1.9547935724258423	Valid_Precision@0.50: 0.013873057439923286	Valid_Recall@0.50: 0.9571176171302795	Valid_mAP@0.50: 0.29446834325790405	Valid_F1@0.50: 0.02684234082698822	
+
+Epoch 2 (3/25)  - LR/Param_group_0: 0.0003336666666666667	LR/Param_group_1: 0.0003336666666666667	
+
+Epoch 3 (4/25)  - Inference_Time: 1272.57421875	Train_PPYoloELoss/loss_cls: 1.060743808746338	Train_PPYoloELoss/loss_iou: 0.6036450862884521	Train_PPYoloELoss/loss_dfl: 0.4942665100097656	Train_PPYoloELoss/loss: 2.158655881881714	Valid_PPYoloELoss/loss_cls: 0.9648526310920715	Valid_PPYoloELoss/loss_iou: 0.49159306287765503	Valid_PPYoloELoss/loss_dfl: 0.3488925099372864	Valid_PPYoloELoss/loss: 1.8053382635116577	Valid_Precision@0.50: 0.01697482168674469	Valid_Recall@0.50: 0.9678013920783997	Valid_mAP@0.50: 0.31083065271377563	Valid_F1@0.50: 0.032855384051799774	
+
+Epoch 3 (4/25)  - LR/Param_group_0: 0.0005	LR/Param_group_1: 0.0005	
+
+Epoch 4 (5/25)  - Inference_Time: 1456.0050048828125	Train_PPYoloELoss/loss_cls: 1.0074050426483154	Train_PPYoloELoss/loss_iou: 0.5684701800346375	Train_PPYoloELoss/loss_dfl: 0.47242027521133423	Train_PPYoloELoss/loss: 2.048295497894287	Valid_PPYoloELoss/loss_cls: 1.1050927639007568	Valid_PPYoloELoss/loss_iou: 0.48254281282424927	Valid_PPYoloELoss/loss_dfl: 0.3495025634765625	Valid_PPYoloELoss/loss: 1.9371379613876343	Valid_Precision@0.50: 0.018290065228939056	Valid_Recall@0.50: 0.6705717444419861	Valid_mAP@0.50: 0.27344608306884766	Valid_F1@0.50: 0.034391991794109344	
+
+Epoch 4 (5/25)  - LR/Param_group_0: 0.0004977928616633414	LR/Param_group_1: 0.0004977928616633414	
+
+Epoch 5 (6/25)  - Inference_Time: 1050.73828125	Train_PPYoloELoss/loss_cls: 0.993816077709198	Train_PPYoloELoss/loss_iou: 0.5639011263847351	Train_PPYoloELoss/loss_dfl: 0.46901124715805054	Train_PPYoloELoss/loss: 2.026728391647339	Valid_PPYoloELoss/loss_cls: 0.8803224563598633	Valid_PPYoloELoss/loss_iou: 0.4905926287174225	Valid_PPYoloELoss/loss_dfl: 0.3590928316116333	Valid_PPYoloELoss/loss: 1.7300078868865967	Valid_Precision@0.50: 0.026684580370783806	Valid_Recall@0.50: 0.926982045173645	Valid_mAP@0.50: 0.3385984003543854	Valid_F1@0.50: 0.05041923373937607	
+
+Epoch 5 (6/25)  - LR/Param_group_0: 0.0004910582207246684	LR/Param_group_1: 0.0004910582207246684	
+
+Epoch 6 (7/25)  - Inference_Time: 1050.25537109375	Train_PPYoloELoss/loss_cls: 0.9711758494377136	Train_PPYoloELoss/loss_iou: 0.5536878108978271	Train_PPYoloELoss/loss_dfl: 0.4702807068824768	Train_PPYoloELoss/loss: 1.9951443672180176	Valid_PPYoloELoss/loss_cls: 0.8493024706840515	Valid_PPYoloELoss/loss_iou: 0.5063905119895935	Valid_PPYoloELoss/loss_dfl: 0.3559064567089081	Valid_PPYoloELoss/loss: 1.711599588394165	Valid_Precision@0.50: 0.03217462822794914	Valid_Recall@0.50: 0.6898761987686157	Valid_mAP@0.50: 0.32839131355285645	Valid_F1@0.50: 0.0595843642950058	
+
+Epoch 6 (7/25)  - LR/Param_group_0: 0.0004799322520672502	LR/Param_group_1: 0.0004799322520672502	
+
+Epoch 7 (8/25)  - Inference_Time: 1024.0299072265625	Train_PPYoloELoss/loss_cls: 0.9229022264480591	Train_PPYoloELoss/loss_iou: 0.5313704609870911	Train_PPYoloELoss/loss_dfl: 0.44898608326911926	Train_PPYoloELoss/loss: 1.9032588005065918	Valid_PPYoloELoss/loss_cls: 0.8256828188896179	Valid_PPYoloELoss/loss_iou: 0.4658026099205017	Valid_PPYoloELoss/loss_dfl: 0.3413749933242798	Valid_PPYoloELoss/loss: 1.632860541343689	Valid_Precision@0.50: 0.041067253798246384	Valid_Recall@0.50: 0.9355289936065674	Valid_mAP@0.50: 0.3410348892211914	Valid_F1@0.50: 0.07568297535181046	
+
+Epoch 7 (8/25)  - LR/Param_group_0: 0.0004646410881400134	LR/Param_group_1: 0.0004646410881400134	
+
+Epoch 8 (9/25)  - Inference_Time: 1020.4989013671875	Train_PPYoloELoss/loss_cls: 0.9183423519134521	Train_PPYoloELoss/loss_iou: 0.5337502956390381	Train_PPYoloELoss/loss_dfl: 0.4557287096977234	Train_PPYoloELoss/loss: 1.9078212976455688	Valid_PPYoloELoss/loss_cls: 0.7993412613868713	Valid_PPYoloELoss/loss_iou: 0.479951947927475	Valid_PPYoloELoss/loss_dfl: 0.34458857774734497	Valid_PPYoloELoss/loss: 1.6238819360733032	Valid_Precision@0.50: 0.041237786412239075	Valid_Recall@0.50: 0.46131742000579834	Valid_mAP@0.50: 0.34932178258895874	Valid_F1@0.50: 0.07283766567707062	
+
+Epoch 8 (9/25)  - LR/Param_group_0: 0.0004454955179135437	LR/Param_group_1: 0.0004454955179135437	
+
+Epoch 9 (10/25)  - Inference_Time: 1555.4500732421875	Train_PPYoloELoss/loss_cls: 0.9163742661476135	Train_PPYoloELoss/loss_iou: 0.5128834247589111	Train_PPYoloELoss/loss_dfl: 0.4459497928619385	Train_PPYoloELoss/loss: 1.8752073049545288	Valid_PPYoloELoss/loss_cls: 0.8259218335151672	Valid_PPYoloELoss/loss_iou: 0.4459775984287262	Valid_PPYoloELoss/loss_dfl: 0.33805814385414124	Valid_PPYoloELoss/loss: 1.6099574565887451	Valid_Precision@0.50: 0.0653841570019722	Valid_Recall@0.50: 0.7070438861846924	Valid_mAP@0.50: 0.3573445975780487	Valid_F1@0.50: 0.11594783514738083	
+
+Epoch 9 (10/25)  - LR/Param_group_0: 0.0004228846701742609	LR/Param_group_1: 0.0004228846701742609	
+
+Epoch 10 (11/25)  - Inference_Time: 1332.23828125	Train_PPYoloELoss/loss_cls: 0.8864692449569702	Train_PPYoloELoss/loss_iou: 0.5193089246749878	Train_PPYoloELoss/loss_dfl: 0.44698062539100647	Train_PPYoloELoss/loss: 1.8527588844299316	Valid_PPYoloELoss/loss_cls: 0.9110561609268188	Valid_PPYoloELoss/loss_iou: 0.424938440322876	Valid_PPYoloELoss/loss_dfl: 0.33364972472190857	Valid_PPYoloELoss/loss: 1.6696443557739258	Valid_Precision@0.50: 0.037295639514923096	Valid_Recall@0.50: 0.44849690794944763	Valid_mAP@0.50: 0.3396555185317993	Valid_F1@0.50: 0.05286448821425438	
+
+Epoch 10 (11/25)  - LR/Param_group_0: 0.0003972681045820052	LR/Param_group_1: 0.0003972681045820052	
+
+Epoch 11 (12/25)  - Inference_Time: 1212.4227294921875	Train_PPYoloELoss/loss_cls: 0.8827023506164551	Train_PPYoloELoss/loss_iou: 0.5146954655647278	Train_PPYoloELoss/loss_dfl: 0.43593302369117737	Train_PPYoloELoss/loss: 1.833330512046814	Valid_PPYoloELoss/loss_cls: 0.7957647442817688	Valid_PPYoloELoss/loss_iou: 0.4490933418273926	Valid_PPYoloELoss/loss_dfl: 0.3297271430492401	Valid_PPYoloELoss/loss: 1.574585199356079	Valid_Precision@0.50: 0.04757207632064819	Valid_Recall@0.50: 0.9225611686706543	Valid_mAP@0.50: 0.3806379437446594	Valid_F1@0.50: 0.08757784217596054	
+
+Epoch 11 (12/25)  - LR/Param_group_0: 0.00036916647123824925	LR/Param_group_1: 0.00036916647123824925	
+
+Epoch 12 (13/25)  - Inference_Time: 1105.1585693359375	Train_PPYoloELoss/loss_cls: 0.85914146900177	Train_PPYoloELoss/loss_iou: 0.5057193040847778	Train_PPYoloELoss/loss_dfl: 0.43179720640182495	Train_PPYoloELoss/loss: 1.7966578006744385	Valid_PPYoloELoss/loss_cls: 0.8352642059326172	Valid_PPYoloELoss/loss_iou: 0.4403974115848541	Valid_PPYoloELoss/loss_dfl: 0.32641053199768066	Valid_PPYoloELoss/loss: 1.6020721197128296	Valid_Precision@0.50: 0.048939041793346405	Valid_Recall@0.50: 0.9484232068061829	Valid_mAP@0.50: 0.3612099885940552	Valid_F1@0.50: 0.08791781961917877	
+
+Epoch 12 (13/25)  - LR/Param_group_0: 0.00033915092860681143	LR/Param_group_1: 0.00033915092860681143	
+
+Epoch 13 (14/25)  - Inference_Time: 1158.0794677734375	Train_PPYoloELoss/loss_cls: 0.849576473236084	Train_PPYoloELoss/loss_iou: 0.49337491393089294	Train_PPYoloELoss/loss_dfl: 0.42284253239631653	Train_PPYoloELoss/loss: 1.765794038772583	Valid_PPYoloELoss/loss_cls: 0.8056732416152954	Valid_PPYoloELoss/loss_iou: 0.43292665481567383	Valid_PPYoloELoss/loss_dfl: 0.3229924142360687	Valid_PPYoloELoss/loss: 1.5615923404693604	Valid_Precision@0.50: 0.06326032429933548	Valid_Recall@0.50: 0.4076038897037506	Valid_mAP@0.50: 0.3665436804294586	Valid_F1@0.50: 0.08520498871803284	
+
+Epoch 13 (14/25)  - LR/Param_group_0: 0.0003078315348651059	LR/Param_group_1: 0.0003078315348651059	
+
+Epoch 14 (15/25)  - Inference_Time: 1129.623779296875	Train_PPYoloELoss/loss_cls: 0.8550556302070618	Train_PPYoloELoss/loss_iou: 0.49951469898223877	Train_PPYoloELoss/loss_dfl: 0.43672502040863037	Train_PPYoloELoss/loss: 1.7912954092025757	Valid_PPYoloELoss/loss_cls: 0.8109340667724609	Valid_PPYoloELoss/loss_iou: 0.44096413254737854	Valid_PPYoloELoss/loss_dfl: 0.32756808400154114	Valid_PPYoloELoss/loss: 1.5794661045074463	Valid_Precision@0.50: 0.05683206766843796	Valid_Recall@0.50: 0.42477160692214966	Valid_mAP@0.50: 0.36333638429641724	Valid_F1@0.50: 0.09322689473628998	
+
+Epoch 14 (15/25)  - LR/Param_group_0: 0.0002758448486287267	LR/Param_group_1: 0.0002758448486287267	
+
+Epoch 15 (16/25)  - Inference_Time: 1281.3385009765625	Train_PPYoloELoss/loss_cls: 0.8363763689994812	Train_PPYoloELoss/loss_iou: 0.4859614074230194	Train_PPYoloELoss/loss_dfl: 0.42395350337028503	Train_PPYoloELoss/loss: 1.7462912797927856	Valid_PPYoloELoss/loss_cls: 0.7788426280021667	Valid_PPYoloELoss/loss_iou: 0.4131287932395935	Valid_PPYoloELoss/loss_dfl: 0.3196546137332916	Valid_PPYoloELoss/loss: 1.5116260051727295	Valid_Precision@0.50: 0.060535307973623276	Valid_Recall@0.50: 0.45697021484375	Valid_mAP@0.50: 0.36747148633003235	Valid_F1@0.50: 0.09537574648857117	
+
+Epoch 15 (16/25)  - LR/Param_group_0: 0.00024384099106144883	LR/Param_group_1: 0.00024384099106144883	
+
+Epoch 16 (17/25)  - Inference_Time: 1113.9266357421875	Train_PPYoloELoss/loss_cls: 0.8339663743972778	Train_PPYoloELoss/loss_iou: 0.493710994720459	Train_PPYoloELoss/loss_dfl: 0.4257337152957916	Train_PPYoloELoss/loss: 1.7534106969833374	Valid_PPYoloELoss/loss_cls: 0.7887862920761108	Valid_PPYoloELoss/loss_iou: 0.4407058358192444	Valid_PPYoloELoss/loss_dfl: 0.3324233591556549	Valid_PPYoloELoss/loss: 1.5619155168533325	Valid_Precision@0.50: 0.08242017030715942	Valid_Recall@0.50: 0.41828763484954834	Valid_mAP@0.50: 0.3761085867881775	Valid_F1@0.50: 0.11347255110740662	
+
+Epoch 16 (17/25)  - LR/Param_group_0: 0.00021247043232992712	LR/Param_group_1: 0.00021247043232992712	
+
+Epoch 17 (18/25)  - Inference_Time: 1133.6446533203125	Train_PPYoloELoss/loss_cls: 0.816640317440033	Train_PPYoloELoss/loss_iou: 0.4856167137622833	Train_PPYoloELoss/loss_dfl: 0.4190466105937958	Train_PPYoloELoss/loss: 1.7213038206100464	Valid_PPYoloELoss/loss_cls: 0.8139435648918152	Valid_PPYoloELoss/loss_iou: 0.4185391068458557	Valid_PPYoloELoss/loss_dfl: 0.3269072473049164	Valid_PPYoloELoss/loss: 1.5593898296356201	Valid_Precision@0.50: 0.06624995172023773	Valid_Recall@0.50: 0.41401416063308716	Valid_mAP@0.50: 0.35946089029312134	Valid_F1@0.50: 0.1069267988204956	
+
+Epoch 17 (18/25)  - LR/Param_group_0: 0.00018237077096500302	LR/Param_group_1: 0.00018237077096500302	
+
+Epoch 18 (19/25)  - Inference_Time: 1137.6767578125	Train_PPYoloELoss/loss_cls: 0.8040111064910889	Train_PPYoloELoss/loss_iou: 0.4663390517234802	Train_PPYoloELoss/loss_dfl: 0.41150999069213867	Train_PPYoloELoss/loss: 1.6818604469299316	Valid_PPYoloELoss/loss_cls: 0.8198854327201843	Valid_PPYoloELoss/loss_iou: 0.4230397343635559	Valid_PPYoloELoss/loss_dfl: 0.324205607175827	Valid_PPYoloELoss/loss: 1.5671308040618896	Valid_Precision@0.50: 0.07480130344629288	Valid_Recall@0.50: 0.41615089774131775	Valid_mAP@0.50: 0.3543773591518402	Valid_F1@0.50: 0.1233011782169342	
+
+Epoch 18 (19/25)  - LR/Param_group_0: 0.00015415377483569504	LR/Param_group_1: 0.00015415377483569504	
+
+Epoch 19 (20/25)  - Inference_Time: 1094.6202392578125	Train_PPYoloELoss/loss_cls: 0.7962556481361389	Train_PPYoloELoss/loss_iou: 0.47207438945770264	Train_PPYoloELoss/loss_dfl: 0.411098450422287	Train_PPYoloELoss/loss: 1.6794284582138062	Valid_PPYoloELoss/loss_cls: 0.7980189919471741	Valid_PPYoloELoss/loss_iou: 0.46060165762901306	Valid_PPYoloELoss/loss_dfl: 0.33081185817718506	Valid_PPYoloELoss/loss: 1.5894324779510498	Valid_Precision@0.50: 0.06644286215305328	Valid_Recall@0.50: 0.43766579031944275	Valid_mAP@0.50: 0.3729094862937927	Valid_F1@0.50: 0.10787812620401382	
+
+Epoch 19 (20/25)  - LR/Param_group_0: 0.00012839294712474106	LR/Param_group_1: 0.00012839294712474106	
+
+Epoch 20 (21/25)  - Inference_Time: 1590.36669921875	Train_PPYoloELoss/loss_cls: 0.7888835668563843	Train_PPYoloELoss/loss_iou: 0.4635158181190491	Train_PPYoloELoss/loss_dfl: 0.4086005389690399	Train_PPYoloELoss/loss: 1.6609998941421509	Valid_PPYoloELoss/loss_cls: 0.7545824646949768	Valid_PPYoloELoss/loss_iou: 0.41277942061424255	Valid_PPYoloELoss/loss_dfl: 0.3220638632774353	Valid_PPYoloELoss/loss: 1.489425778388977	Valid_Precision@0.50: 0.06447006016969681	Valid_Recall@0.50: 0.43766579031944275	Valid_mAP@0.50: 0.38095998764038086	Valid_F1@0.50: 0.09770263731479645	
+
+Epoch 20 (21/25)  - LR/Param_group_0: 0.00010561187002404093	LR/Param_group_1: 0.00010561187002404093	
+
+Epoch 21 (22/25)  - Inference_Time: 1504.15478515625	Train_PPYoloELoss/loss_cls: 0.7870663404464722	Train_PPYoloELoss/loss_iou: 0.46590128540992737	Train_PPYoloELoss/loss_dfl: 0.4085269868373871	Train_PPYoloELoss/loss: 1.6614943742752075	Valid_PPYoloELoss/loss_cls: 0.7438532114028931	Valid_PPYoloELoss/loss_iou: 0.3801879286766052	Valid_PPYoloELoss/loss_dfl: 0.31364327669143677	Valid_PPYoloELoss/loss: 1.437684416770935	Valid_Precision@0.50: 0.07515532523393631	Valid_Recall@0.50: 0.6855290532112122	Valid_mAP@0.50: 0.3843209147453308	Valid_F1@0.50: 0.1288430392742157	
+
+Epoch 21 (22/25)  - LR/Param_group_0: 8.6273563061385e-05	LR/Param_group_1: 8.6273563061385e-05	
+
+Epoch 22 (23/25)  - Inference_Time: 1279.790283203125	Train_PPYoloELoss/loss_cls: 0.7775503396987915	Train_PPYoloELoss/loss_iou: 0.4617929458618164	Train_PPYoloELoss/loss_dfl: 0.4037324786186218	Train_PPYoloELoss/loss: 1.6430758237838745	Valid_PPYoloELoss/loss_cls: 0.7760778665542603	Valid_PPYoloELoss/loss_iou: 0.4137718081474304	Valid_PPYoloELoss/loss_dfl: 0.3255087733268738	Valid_PPYoloELoss/loss: 1.515358567237854	Valid_Precision@0.50: 0.06996846199035645	Valid_Recall@0.50: 0.4226348400115967	Valid_mAP@0.50: 0.36883115768432617	Valid_F1@0.50: 0.1178569346666336	
+
+Epoch 22 (23/25)  - LR/Param_group_0: 7.077107234774229e-05	LR/Param_group_1: 7.077107234774229e-05	
+
+Epoch 23 (24/25)  - Inference_Time: 1115.800537109375	Train_PPYoloELoss/loss_cls: 0.7718565464019775	Train_PPYoloELoss/loss_iou: 0.4445576071739197	Train_PPYoloELoss/loss_dfl: 0.4001256823539734	Train_PPYoloELoss/loss: 1.6165395975112915	Valid_PPYoloELoss/loss_cls: 0.7690684795379639	Valid_PPYoloELoss/loss_iou: 0.4308291971683502	Valid_PPYoloELoss/loss_dfl: 0.3321656882762909	Valid_PPYoloELoss/loss: 1.5320632457733154	Valid_Precision@0.50: 0.06995542347431183	Valid_Recall@0.50: 0.43552905321121216	Valid_mAP@0.50: 0.37335890531539917	Valid_F1@0.50: 0.11468462646007538	
+
+Epoch 23 (24/25)  - LR/Param_group_0: 5.941948201623229e-05	LR/Param_group_1: 5.941948201623229e-05	
+
+Epoch 24 (25/25)  - Inference_Time: 1118.1739501953125	Train_PPYoloELoss/loss_cls: 0.7729944586753845	Train_PPYoloELoss/loss_iou: 0.45769697427749634	Train_PPYoloELoss/loss_dfl: 0.399055153131485	Train_PPYoloELoss/loss: 1.6297467947006226	Valid_PPYoloELoss/loss_cls: 0.7724004983901978	Valid_PPYoloELoss/loss_iou: 0.4340013563632965	Valid_PPYoloELoss/loss_dfl: 0.3276980519294739	Valid_PPYoloELoss/loss: 1.534099817276001	Valid_Precision@0.50: 0.0707382783293724	Valid_Recall@0.50: 0.4312555193901062	Valid_mAP@0.50: 0.36893603205680847	Valid_F1@0.50: 0.11950341612100601	
+
+Epoch 24 (25/25)  - LR/Param_group_0: 5.2449510218228526e-05	LR/Param_group_1: 5.2449510218228526e-05	
