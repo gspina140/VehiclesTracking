@@ -1,5 +1,7 @@
 # VehiclesTracking
-![](https://github.com/gspina140/VehiclesTracking/blob/main/tracking.gif)
+<p align="center">
+  <img src="https://github.com/gspina140/VehiclesTracking/blob/main/tracking.gif" alt="animated" />
+</p>
 This repository contains the project of the intnership made at T3Lab (https://www.t3lab.it/) for the master's degree at Unibo a.y. 2023/2024. The work aims to analyze the traffic on the roads in the area of Emilia-Romagna IT, in order to achieve stastistcs regarding the traffic flow over time. Having that kind of information one could be able, for example, to retrieve the intersections where there is the higher number of congestions in a week, and consequently intevene to improve the quality of the streets. To analyze the videos coming from the traffic cameras, Deep Learning techniques are exploited.  
 
 # Execution Instructions
